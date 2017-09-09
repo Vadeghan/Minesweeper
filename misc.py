@@ -19,3 +19,6 @@ for row in range(num_rows):
         print(str(cell + str(cell_num)))
         cell_num += 1
 
+
+
+if a1 in list:

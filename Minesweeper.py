@@ -6,41 +6,46 @@
 from tkinter import *
 from tkinter import ttk
 
-root = Tk()  # Creates Window
+import random
+
+root = Tk()  # Creates the GUI's main window
+root.resizable(0, 0)  # disables resizing
 root.title("Minesweeper")
 root.wm_iconbitmap('assets\ico\mine.ico')
 
-frame = Frame(root)
+Label(root, text="Minesweeper").grid(row=0, column=0, columnspan=10)
+
+x = 9
+y = 9
+mines = 9
 
 
 class Cell:
-    def __init__(self, mine, num, clicked):
+    blank_img = PhotoImage(file=r"assets\gif\blank.gif")
+    mine_img = PhotoImage(file="assets\gif\mine.gif")
+    flag_img = PhotoImage(file=r"assets\gif\flag.gif")
 
-        self.cell_numbers = []
-
-        for icon in range(1, 9):
-            self.cell_numbers.append(PhotoImage(file="assets/ico/1.ico"))  # must find way to import .ico
-
+    def __init__(self, width, height, mine, num, clicked):
         self.mine = False
         self.num = 0
         self.clicked = False
-        button = Button(root, height=1, width=2)
 
-        if clicked:
-            button = Button(root, text=num, height=1, width=2)
+        def click():
+            pass
 
-        button.pack()
+        button = Button(root, command=click)
+        button.config(image=self.blank_img)
+        button.grid(row=width, column=height)
 
+random.sample(range(x), mines)
+random.sample(range(y), mines)
 
-""""""
-Label(text="Minesweeper").pack()
+cells = {}
 
-a1 = Cell(True, 1, True)
-a2 = Cell(True, 2, True)
+for row in range(1, (x + 1)):
+    for cell in range(1, (y + 1)):
+        cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False, 0, False)
 
-frame.pack()
-
-""""""
+# Label(root, text="Minesweeper").grid()
 
 root.mainloop()  # Keeps window running until closed out
-
