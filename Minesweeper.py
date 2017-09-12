@@ -19,9 +19,6 @@ x = 9
 y = 9
 mines = 10
 
-random.sample(range(mines), x)
-random.sample(range(mines), y)
-
 cells = {}
 
 
@@ -42,14 +39,27 @@ class Cell:
         button.config(image=self.blank_img)
         button.grid(row=width, column=height)
 
+        if mine:
+            button.config(image=self.mine_img)
+
 
 def new_game():
+    locations = []
+
+    for i in range(1, (y + 1)):
+        locations += list(range(int(str(i) + str(1)), int(str(i) + str(x))))
+
+    mine_locations = random.sample(locations, mines)
+
     for row in range(1, (x + 1)):
         for cell in range(1, (y + 1)):
-            cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False, 0, False)
+            if int(str(row) + str(cell)) in mine_locations:
+                cells["{0}{1}".format(row, cell)] = Cell(row, cell, True, 0, False)
+            else:
+                cells["{0}{1}".format(row, cell)] = Cell(row, cell, False, 0, False)
 
 
-def options():
+def options():  # rewrite this in a more pythonic way
     options_menu = Toplevel()
     options_menu.wm_iconbitmap(r'assets\ico\blank.ico')
     options_menu.title("Options")
