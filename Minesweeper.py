@@ -23,40 +23,74 @@ cells = {}
 
 
 class Cell:
-    blank_img = PhotoImage(file=r"assets\gif\blank.gif")
-    mine_img = PhotoImage(file="assets\gif\mine.gif")
-    flag_img = PhotoImage(file=r"assets\gif\flag.gif")
+    img_nums = []
+    img_blank = PhotoImage(file="assets/gif/blank.gif")
+    img_mine = PhotoImage(file="assets/gif/mine.gif")
+    img_flag = PhotoImage(file="assets/gif/flag.gif")
+    for img in range(1, 9):
+        img_nums.append(PhotoImage(file="assets/gif/" + str(img) + ".gif"))
 
-    def __init__(self, width, height, mine, num, clicked):
-        self.mine = False
-        self.num = 0
+    def __init__(self, position_x, position_y, mine):
+        self.has_mine = mine
+        self.number = 0
         self.clicked = False
+        self.x = position_x
+        self.y = position_y
 
         def click():
             pass
 
         button = Button(root, command=click)
-        button.config(image=self.blank_img)
-        button.grid(row=width, column=height)
+        # button.config(image=self.img_blank)
+
+
+        button.grid(row=position_x, column=position_y)
 
         if mine:
-            button.config(image=self.mine_img)
+            button.config(image=self.img_mine)
+
+        global assign_num
+        def assign_num():
+            button.config(text=self.number)
 
 
 def new_game():
     locations = []
 
     for i in range(1, (y + 1)):
-        locations += list(range(int(str(i) + str(1)), int(str(i) + str(x))))
+        locations += list(range(int(str(i) + str(1)), int(str(i + 1) + str(0))))
 
     mine_locations = random.sample(locations, mines)
 
     for row in range(1, (x + 1)):
         for cell in range(1, (y + 1)):
             if int(str(row) + str(cell)) in mine_locations:
-                cells["{0}{1}".format(row, cell)] = Cell(row, cell, True, 0, False)
+                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, True)
             else:
-                cells["{0}{1}".format(row, cell)] = Cell(row, cell, False, 0, False)
+                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False)
+
+    place_numbers()
+
+
+def place_numbers():
+    for i in cells:
+        if cells[i].has_mine:
+            try:
+                cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) + 1))].number += 1  # right
+                cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) - 1))].number += 1  # left
+                cells["cell{0}".format(str(int(cells[i].x) + 1) + str(int(cells[i].y)))].number += 1  # bottom
+                cells["cell{0}".format(str(int(cells[i].x) - 1) + str(int(cells[i].y)))].number += 1  # top
+
+                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) + 1)].number += 1  # top right
+                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) - 1)].number += 1  # top left
+
+                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) + 1)].number += 1  # bottom right
+                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) - 1)].number += 1  # bottom left
+
+            except KeyError:
+                print("cell does not exist")
+
+    assign_num()
 
 
 def options():  # rewrite this in a more pythonic way
@@ -118,3 +152,4 @@ root.config(menu=menu)
 
 new_game()
 root.mainloop()  # Keeps window running until closed out
+
