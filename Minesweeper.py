@@ -30,7 +30,7 @@ class Cell:
     for img in range(1, 9):
         img_nums.append(PhotoImage(file="assets/gif/" + str(img) + ".gif"))
 
-    def __init__(self, position_x, position_y, mine):
+    def __init__(self, position_x, position_y, mine, name):
         self.has_mine = mine
         self.number = 0
         self.clicked = False
@@ -43,15 +43,16 @@ class Cell:
         button = Button(root, command=click)
         # button.config(image=self.img_blank)
 
-
         button.grid(row=position_x, column=position_y)
 
-        if mine:
+        if self.has_mine:
             button.config(image=self.img_mine)
 
         global assign_num
+
         def assign_num():
-            button.config(text=self.number)
+            button.config(text=str(self.number))
+            print("it worked!")
 
 
 def new_game():
@@ -65,9 +66,9 @@ def new_game():
     for row in range(1, (x + 1)):
         for cell in range(1, (y + 1)):
             if int(str(row) + str(cell)) in mine_locations:
-                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, True)
+                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, True, f"cell{row}{cell}")
             else:
-                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False)
+                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False, f"cell{row}{cell}")
 
     place_numbers()
 
