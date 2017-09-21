@@ -17,20 +17,19 @@ Label(root, text="Minesweeper").grid(row=0, column=0, columnspan=10)
 
 x = 9
 y = 9
-mines = 10
+mines = 1
 
 cells = {}
 
+img_nums = []
+img_mine = PhotoImage(file="assets/gif/mine.gif")
+img_flag = PhotoImage(file="assets/gif/flag.gif")
+for img in range(9):
+    img_nums.append(PhotoImage(file="assets/gif/" + str(img) + ".gif"))
+
 
 class Cell:
-    img_nums = []
-    img_blank = PhotoImage(file="assets/gif/blank.gif")
-    img_mine = PhotoImage(file="assets/gif/mine.gif")
-    img_flag = PhotoImage(file="assets/gif/flag.gif")
-    for img in range(1, 9):
-        img_nums.append(PhotoImage(file="assets/gif/" + str(img) + ".gif"))
-
-    def __init__(self, position_x, position_y, mine, name):
+    def __init__(self, position_y, position_x, mine, name):
         self.has_mine = mine
         self.number = 0
         self.clicked = False
@@ -45,14 +44,13 @@ class Cell:
 
         button.grid(row=position_x, column=position_y)
 
-        if self.has_mine:
-            button.config(image=self.img_mine)
-
         global assign_num
 
         def assign_num():
-            button.config(text=str(self.number))
-            print("it worked!")
+            if self.has_mine:
+                button.config(image=img_mine)
+            else:
+                button.config(image=img_nums[self.number])
 
 
 def new_game():
@@ -70,7 +68,7 @@ def new_game():
             else:
                 cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False, f"cell{row}{cell}")
 
-    place_numbers()
+            place_numbers()
 
 
 def place_numbers():
@@ -78,15 +76,15 @@ def place_numbers():
         if cells[i].has_mine:
             try:
                 cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) + 1))].number += 1  # right
-                cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) - 1))].number += 1  # left
-                cells["cell{0}".format(str(int(cells[i].x) + 1) + str(int(cells[i].y)))].number += 1  # bottom
-                cells["cell{0}".format(str(int(cells[i].x) - 1) + str(int(cells[i].y)))].number += 1  # top
+                # cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) - 1))].number += 1  # left
+                # cells["cell{0}".format(str(int(cells[i].x) + 1) + str(int(cells[i].y)))].number += 1  # bottom
+                # cells["cell{0}".format(str(int(cells[i].x) - 1) + str(int(cells[i].y)))].number += 1  # top
 
-                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) + 1)].number += 1  # top right
-                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) - 1)].number += 1  # top left
+                # cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) + 1)].number += 1  # top right
+                # cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) - 1)].number += 1  # top left
 
-                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) + 1)].number += 1  # bottom right
-                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) - 1)].number += 1  # bottom left
+                # cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) + 1)].number += 1  # bottom right
+                # cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) - 1)].number += 1  # bottom left
 
             except KeyError:
                 print("cell does not exist")
