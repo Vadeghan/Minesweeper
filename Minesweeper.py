@@ -29,7 +29,7 @@ for img in range(9):
 
 
 class Cell:
-    def __init__(self, position_y, position_x, mine, name):
+    def __init__(self, position_x, position_y, mine, name):
         self.has_mine = mine
         self.number = 0
         self.clicked = False
@@ -40,9 +40,10 @@ class Cell:
             pass
 
         button = Button(root, command=click)
-        # button.config(image=self.img_blank)
 
         button.grid(row=position_x, column=position_y)
+        print(position_x)
+        print(position_y)
 
         global assign_num
 
@@ -77,19 +78,19 @@ def place_numbers():
             try:
                 cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) + 1))].number += 1  # right
                 # cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) - 1))].number += 1  # left
-                # cells["cell{0}".format(str(int(cells[i].x) + 1) + str(int(cells[i].y)))].number += 1  # bottom
+                cells["cell{0}".format(str(int(cells[i].x) + 1) + str(int(cells[i].y)))].number += 1  # bottom
                 # cells["cell{0}".format(str(int(cells[i].x) - 1) + str(int(cells[i].y)))].number += 1  # top
 
                 # cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) + 1)].number += 1  # top right
                 # cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) - 1)].number += 1  # top left
 
-                # cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) + 1)].number += 1  # bottom right
-                # cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) - 1)].number += 1  # bottom left
+                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) + 1)].number += 1  # bottom right
+                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) - 1)].number += 1  # bottom left
 
             except KeyError:
                 print("cell does not exist")
 
-    assign_num()
+        assign_num()
 
 
 def options():  # rewrite this in a more pythonic way
