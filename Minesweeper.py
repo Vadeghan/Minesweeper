@@ -17,7 +17,7 @@ Label(root, text="Minesweeper").grid(row=0, column=0, columnspan=10)
 
 x = 9
 y = 9
-mines = 1
+mines = 10
 
 cells = {}
 
@@ -39,26 +39,70 @@ class Cell:
         def click():
             pass
 
-        button = Button(root, command=click)
+        self.button = Button(root, command=click)
+        self.button.grid(row=position_x, column=position_y)
 
-        button.grid(row=position_x, column=position_y)
-        print(position_x)
-        print(position_y)
+        def flag(right_click):
+            self.button.config(image=img_flag)
 
-        global assign_num
+        self.button.bind('<Button-3>', flag)  # bind right mouse click
 
-        def assign_num():
-            if self.has_mine:
-                button.config(image=img_mine)
-            else:
-                button.config(image=img_nums[self.number])
+
+def place_numbers():
+    for i in cells:
+        if cells[i].has_mine:
+            try:
+                cells["cell{0}{1}".format(cells[i].x, cells[i].y + 1)].number += 1  # right
+            except KeyError:
+                pass
+
+            try:
+                cells["cell{0}{1}".format(cells[i].x, cells[i].y - 1)].number += 1  # left
+            except KeyError:
+                pass
+
+            try:
+                cells["cell{0}{1}".format(cells[i].x + 1, cells[i].y)].number += 1  # bottom
+            except KeyError:
+                pass
+
+            try:
+                cells["cell{0}{1}".format(cells[i].x - 1, cells[i].y)].number += 1  # top
+            except KeyError:
+                pass
+
+            try:
+                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) + 1)].number += 1  # top right
+            except KeyError:
+                pass
+
+            try:
+                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) - 1)].number += 1  # top left
+            except KeyError:
+                pass
+
+            try:
+                cells["cell{0}{1}".format(cells[i].x + 1, cells[i].y + 1)].number += 1  # bottom right
+            except KeyError:
+                pass
+
+            try:
+                cells["cell{0}{1}".format(cells[i].x + 1, cells[i].y - 1)].number += 1  # bottom left
+            except KeyError:
+                pass
+
+            cells[i].button.config(image=img_mine)
+
+    for k in cells:
+        if not cells[k].has_mine:
+            cells[k].button.config(image=img_nums[cells[k].number])
 
 
 def new_game():
     locations = []
 
-    for i in range(1, (y + 1)):
-        locations += list(range(int(str(i) + str(1)), int(str(i + 1) + str(0))))
+    for j in range(1, (y + 1)):
+        locations += list(range(int(str(j) + str(1)), int(str(j + 1) + str(0))))
 
     mine_locations = random.sample(locations, mines)
 
@@ -69,28 +113,7 @@ def new_game():
             else:
                 cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False, f"cell{row}{cell}")
 
-            place_numbers()
-
-
-def place_numbers():
-    for i in cells:
-        if cells[i].has_mine:
-            try:
-                cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) + 1))].number += 1  # right
-                # cells["cell{0}".format(str(int(cells[i].x)) + str(int(cells[i].y) - 1))].number += 1  # left
-                cells["cell{0}".format(str(int(cells[i].x) + 1) + str(int(cells[i].y)))].number += 1  # bottom
-                # cells["cell{0}".format(str(int(cells[i].x) - 1) + str(int(cells[i].y)))].number += 1  # top
-
-                # cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) + 1)].number += 1  # top right
-                # cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) - 1)].number += 1  # top left
-
-                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) + 1)].number += 1  # bottom right
-                cells["cell{0}".format(str(int(cells[i].x) + 1)) + str(int(cells[i].y) - 1)].number += 1  # bottom left
-
-            except KeyError:
-                print("cell does not exist")
-
-        assign_num()
+    place_numbers()
 
 
 def options():  # rewrite this in a more pythonic way
@@ -151,5 +174,6 @@ menu.add_cascade(label="Help", menu=about_menu)
 root.config(menu=menu)
 
 new_game()
+
 root.mainloop()  # Keeps window running until closed out
 
