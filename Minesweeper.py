@@ -36,13 +36,13 @@ class Cell:
         self.has_mine = mine
         self.number = 0
         self.clicked = False
+        self.flagged = False
         self.x = position_x
         self.y = position_y
 
-        self.flagged = False
-
         def floodFill():
             self.button.config(image=img_nums[self.number], relief=RIDGE)
+            self.clicked = True
 
         def click():
             if self.has_mine:
@@ -50,12 +50,16 @@ class Cell:
                     if cells[l].has_mine:
                         if not cells[l].flagged:
                             cells[l].button.config(image=img_mine, relief=RIDGE)
+                            cells[l].clicked = True
                     elif cells[l].flagged:
                         cells[l].button.config(image=img_not_mine, relief=RIDGE)
+                        cells[l].clicked = True
                 self.button.config(image=img_fail_mine, relief=RIDGE)
+                self.clicked = True
 
             elif self.number > 0:
                 self.button.config(image=img_nums[self.number], relief=RIDGE)
+                self.clicked = True
 
             else:
                 floodFill()
@@ -64,12 +68,13 @@ class Cell:
         self.button.grid(row=position_x, column=position_y)
 
         def flag(right_click):
-            if self.flagged:
-                self.button.config(image=img_blank)
-                self.flagged = False
-            else:
-                self.button.config(image=img_flag)
-                self.flagged = True
+            if not self.clicked:
+                if self.flagged:
+                    self.button.config(image=img_blank, relief=RAISED)
+                    self.flagged = False
+                else:
+                    self.button.config(image=img_flag, relief=RAISED)
+                    self.flagged = True
 
         self.button.bind('<Button-3>', flag)  # bind right mouse click
 
