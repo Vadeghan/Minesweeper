@@ -23,6 +23,8 @@ cells = {}
 
 img_nums = []
 img_mine = PhotoImage(file="assets/gif/mine.gif")
+img_fail_mine = PhotoImage(file="assets/gif/fail_mine.gif")
+img_not_mine = PhotoImage(file="assets/gif/not_mine.gif")
 img_flag = PhotoImage(file="assets/gif/flag.gif")
 for img in range(9):
     img_nums.append(PhotoImage(file="assets/gif/" + str(img) + ".gif"))
@@ -36,14 +38,27 @@ class Cell:
         self.x = position_x
         self.y = position_y
 
+        self.flagged = False
+
         def click():
-            pass
+            if self.has_mine:
+                for l in cells:
+                    if cells[l].has_mine:
+                        if not cells[l].flagged:
+                            cells[l].button.config(image=img_mine)
+                    elif cells[l].flagged:
+                        cells[l].button.config(image=img_not_mine)
+                self.button.config(image=img_fail_mine)
+
+            elif self.number > 0:
+                self.button.config(image=img_nums[self.number])
 
         self.button = Button(root, command=click)
         self.button.grid(row=position_x, column=position_y)
 
         def flag(right_click):
             self.button.config(image=img_flag)
+            self.flagged = True
 
         self.button.bind('<Button-3>', flag)  # bind right mouse click
 
@@ -91,11 +106,10 @@ def place_numbers():
             except KeyError:
                 pass
 
-            cells[i].button.config(image=img_mine)
+            # cells[i].button.config(image=img_mine)
 
     for k in cells:
-        if not cells[k].has_mine:
-            cells[k].button.config(image=img_nums[cells[k].number])
+        cells[k].button.config(image=img_nums[0])
 
 
 def new_game():
