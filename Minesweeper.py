@@ -22,6 +22,7 @@ mines = 10
 cells = {}
 
 img_nums = []
+img_blank = PhotoImage(file="assets/gif/blank.gif")
 img_mine = PhotoImage(file="assets/gif/mine.gif")
 img_fail_mine = PhotoImage(file="assets/gif/fail_mine.gif")
 img_not_mine = PhotoImage(file="assets/gif/not_mine.gif")
@@ -40,25 +41,35 @@ class Cell:
 
         self.flagged = False
 
+        def floodFill():
+            self.button.config(image=img_nums[self.number], relief=RIDGE)
+
         def click():
             if self.has_mine:
                 for l in cells:
                     if cells[l].has_mine:
                         if not cells[l].flagged:
-                            cells[l].button.config(image=img_mine)
+                            cells[l].button.config(image=img_mine, relief=RIDGE)
                     elif cells[l].flagged:
-                        cells[l].button.config(image=img_not_mine)
-                self.button.config(image=img_fail_mine)
+                        cells[l].button.config(image=img_not_mine, relief=RIDGE)
+                self.button.config(image=img_fail_mine, relief=RIDGE)
 
             elif self.number > 0:
-                self.button.config(image=img_nums[self.number])
+                self.button.config(image=img_nums[self.number], relief=RIDGE)
+
+            else:
+                floodFill()
 
         self.button = Button(root, command=click)
         self.button.grid(row=position_x, column=position_y)
 
         def flag(right_click):
-            self.button.config(image=img_flag)
-            self.flagged = True
+            if self.flagged:
+                self.button.config(image=img_blank)
+                self.flagged = False
+            else:
+                self.button.config(image=img_flag)
+                self.flagged = True
 
         self.button.bind('<Button-3>', flag)  # bind right mouse click
 
@@ -106,10 +117,8 @@ def place_numbers():
             except KeyError:
                 pass
 
-            # cells[i].button.config(image=img_mine)
-
     for k in cells:
-        cells[k].button.config(image=img_nums[0])
+        cells[k].button.config(image=img_blank)
 
 
 def new_game():
