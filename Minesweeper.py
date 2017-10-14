@@ -76,6 +76,13 @@ class Cell:
                     self.button.config(image=img_flag, relief=RAISED)
                     self.flagged = True
 
+        def reveal_adjacent(middle_click):
+            """
+            if you middle-click a number, and it is surrounded by exactly that many flags (as indicated by the number),
+            all covered tiles become uncovered﻿
+            """
+
+        self.button.bind('<Button-2>', reveal_adjacent)
         self.button.bind('<Button-3>', flag)  # bind right mouse click
 
 
@@ -204,4 +211,3 @@ root.config(menu=menu)
 new_game()
 
 root.mainloop()  # Keeps window running until closed out
-
