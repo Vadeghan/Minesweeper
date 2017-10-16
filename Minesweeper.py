@@ -43,13 +43,17 @@ class Cell:
 
         def flood_click(position):
             position.clicked = True
-            position.button.config(image=img_nums[cells[position.name].number], relief=RIDGE)
+            if position.flagged:
+                position.button.config(image=img_flag)
+                position.clicked = False
+            else:
+                position.button.config(image=img_nums[cells[position.name].number], relief=RIDGE)
             # flood_fill(position.name)
 
         def flood_fill(selected_cell):
-            cells[selected_cell].button.config(image=img_nums[cells[selected_cell].number], relief=RIDGE)
+            flood_click(cells[selected_cell])
 
-            if cells[selected_cell].number == 0:
+            if cells[selected_cell].number == 0 and not cells[selected_cell].flagged:
                 try:
                     flood_click(cells["cell{0}{1}".format(cells[selected_cell].x, cells[selected_cell].y + 1)])
                 except KeyError:
@@ -93,8 +97,8 @@ class Cell:
         def click():
             if self.has_mine:
                 for l in cells:
-                    if cells[l].has_mine:
-                        if not cells[l].flagged:
+                    if not cells[l].flagged:
+                        if cells[l].has_mine:
                             cells[l].button.config(image=img_mine, relief=RIDGE)
                             cells[l].clicked = True
                     elif cells[l].flagged:
