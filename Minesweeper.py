@@ -33,6 +33,7 @@ for img in range(9):
 
 class Cell:
     def __init__(self, position_x, position_y, mine, name):
+        self.name = name
         self.has_mine = mine
         self.number = 0
         self.clicked = False
@@ -40,9 +41,54 @@ class Cell:
         self.x = position_x
         self.y = position_y
 
-        def floodFill():
-            self.button.config(image=img_nums[self.number], relief=RIDGE)
-            self.clicked = True
+        def flood_click(position):
+            position.clicked = True
+            position.button.config(image=img_nums[cells[position.name].number], relief=RIDGE)
+            # flood_fill(position.name)
+
+        def flood_fill(selected_cell):
+            cells[selected_cell].button.config(image=img_nums[cells[selected_cell].number], relief=RIDGE)
+
+            if cells[selected_cell].number == 0:
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x, cells[selected_cell].y + 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x, cells[selected_cell].y - 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x + 1, cells[selected_cell].y)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x - 1, cells[selected_cell].y)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x - 1, cells[selected_cell].y + 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x - 1, cells[selected_cell].y - 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x + 1, cells[selected_cell].y + 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x + 1, cells[selected_cell].y - 1)])
+                except KeyError:
+                    pass
 
         def click():
             if self.has_mine:
@@ -62,7 +108,7 @@ class Cell:
                 self.clicked = True
 
             else:
-                floodFill()
+                flood_fill(self.name)
 
         self.button = Button(root, command=click)
         self.button.grid(row=position_x, column=position_y)
@@ -110,12 +156,12 @@ def place_numbers():
                 pass
 
             try:
-                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) + 1)].number += 1  # top right
+                cells["cell{0}{1}".format(cells[i].x - 1, cells[i].y + 1)].number += 1  # top right
             except KeyError:
                 pass
 
             try:
-                cells["cell{0}".format(str(int(cells[i].x) - 1)) + str(int(cells[i].y) - 1)].number += 1  # top left
+                cells["cell{0}{1}".format(cells[i].x - 1, cells[i].y - 1)].number += 1  # top left
             except KeyError:
                 pass
 
