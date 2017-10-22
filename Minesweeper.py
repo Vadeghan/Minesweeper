@@ -6,6 +6,7 @@
 from tkinter import *
 from tkinter import ttk
 
+import webbrowser
 import random
 
 root = Tk()  # Creates the GUI's main window
@@ -42,55 +43,18 @@ class Cell:
         self.y = position_y
 
         def flood_click(position):
-            position.clicked = True
             if position.flagged:
                 position.button.config(image=img_flag)
                 position.clicked = False
             else:
+                position.clicked = True
                 position.button.config(image=img_nums[cells[position.name].number], relief=RIDGE)
-            # flood_fill(position.name)
+                flood_fill(position)
 
         def flood_fill(selected_cell):
-            flood_click(cells[selected_cell])
-
-            if cells[selected_cell].number == 0 and not cells[selected_cell].flagged:
+            if selected_cell.number == 0 and not selected_cell.flagged:
                 try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x, cells[selected_cell].y + 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x, cells[selected_cell].y - 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x + 1, cells[selected_cell].y)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x - 1, cells[selected_cell].y)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x - 1, cells[selected_cell].y + 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x - 1, cells[selected_cell].y - 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x + 1, cells[selected_cell].y + 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(cells[selected_cell].x + 1, cells[selected_cell].y - 1)])
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x, selected_cell.y + 1)])
                 except KeyError:
                     pass
 
@@ -102,17 +66,20 @@ class Cell:
                             cells[l].button.config(image=img_mine, relief=RIDGE)
                             cells[l].clicked = True
                     elif cells[l].flagged:
-                        cells[l].button.config(image=img_not_mine, relief=RIDGE)
+                        # cells[l].button.config(image=img_not_mine, relief=RIDGE)
                         cells[l].clicked = True
-                self.button.config(image=img_fail_mine, relief=RIDGE)
+                self.button.config(image=img_fail_mine, relief=RIDGE)  # this doesn't make sense
                 self.clicked = True
-
+            elif self.flagged:
+                pass
             elif self.number > 0:
                 self.button.config(image=img_nums[self.number], relief=RIDGE)
                 self.clicked = True
 
             else:
-                flood_fill(self.name)
+                self.clicked = True
+                self.button.config(image=img_nums[self.number], relief=RIDGE)
+                flood_fill(self)
 
         self.button = Button(root, command=click)
         self.button.grid(row=position_x, column=position_y)
@@ -241,6 +208,9 @@ def options():  # rewrite this in a more pythonic way
     Button(options_menu, text="Save", command=save).pack()
 
 
+def about():
+    webbrowser.open("https://github.com/Vadeghan/Minesweeper")
+
 menu = Menu(root)
 
 game_menu = Menu(menu, tearoff=0)
@@ -251,11 +221,12 @@ game_menu.add_command(label="Exit", command=root.quit)
 
 
 about_menu = Menu(menu, tearoff=0)
-about_menu.add_command(label="About")
+about_menu.add_command(label="About", command=about)
 
 
 menu.add_cascade(label="Game", menu=game_menu)
 menu.add_cascade(label="Help", menu=about_menu)
+
 root.config(menu=menu)
 
 new_game()
