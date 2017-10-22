@@ -58,6 +58,41 @@ class Cell:
                 except KeyError:
                     pass
 
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x, selected_cell.y - 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x + 1, selected_cell.y)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x - 1, selected_cell.y)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x - 1, selected_cell.y + 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x - 1, selected_cell.y - 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x + 1, selected_cell.y + 1)])
+                except KeyError:
+                    pass
+
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x + 1, selected_cell.y - 1)])
+                except KeyError:
+                    pass
+
         def click():
             if self.has_mine:
                 for l in cells:
