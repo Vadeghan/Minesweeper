@@ -1,10 +1,9 @@
 # Minesweeper
 # by Javad Hamidi
-# Minesweeper.py 1.0.0
+# Minesweeper.py 4.1.0
 # 01/09/2017
 
 from tkinter import *
-from tkinter import ttk
 
 import webbrowser
 import random
@@ -21,6 +20,7 @@ y = 9
 mines = 10
 
 cells = {}
+positions = [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1], [-1, 0], [1, 0]]
 
 img_nums = []
 img_blank = PhotoImage(file="assets/gif/blank.gif")
@@ -49,51 +49,21 @@ class Cell:
             else:
                 position.clicked = True
                 position.button.config(image=img_nums[cells[position.name].number], relief=RIDGE)
-                flood_fill(position)
 
         def flood_fill(selected_cell):
+            rad = 1
+            cell_positions = [[0, rad], [0, -rad], [rad, rad], [rad, -rad], [-rad, rad], [-rad, -rad], [-rad, 0], [rad, 0]]
             if selected_cell.number == 0 and not selected_cell.flagged:
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x, selected_cell.y + 1)])
-                except KeyError:
-                    pass
+                for j in range(1, 5):
+                    for i in cell_positions:
+                        try:
+                            flood_click(cells["cell{0}{1}".format(selected_cell.x + i[0], selected_cell.y + i[1])])
+                        except KeyError:
+                            pass
+                    rad += j
+                    cell_positions = cell_positions
 
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x, selected_cell.y - 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x + 1, selected_cell.y)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x - 1, selected_cell.y)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x - 1, selected_cell.y + 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x - 1, selected_cell.y - 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x + 1, selected_cell.y + 1)])
-                except KeyError:
-                    pass
-
-                try:
-                    flood_click(cells["cell{0}{1}".format(selected_cell.x + 1, selected_cell.y - 1)])
-                except KeyError:
-                    pass
-
-        def click():
+        def click():  # redo this
             if self.has_mine:
                 for l in cells:
                     if not cells[l].flagged:
@@ -138,48 +108,14 @@ class Cell:
         self.button.bind('<Button-3>', flag)  # bind right mouse click
 
 
-def place_numbers():
+def place_numbers(positions):
     for i in cells:
         if cells[i].has_mine:
-            try:
-                cells["cell{0}{1}".format(cells[i].x, cells[i].y + 1)].number += 1  # right
-            except KeyError:
-                pass
-
-            try:
-                cells["cell{0}{1}".format(cells[i].x, cells[i].y - 1)].number += 1  # left
-            except KeyError:
-                pass
-
-            try:
-                cells["cell{0}{1}".format(cells[i].x + 1, cells[i].y)].number += 1  # bottom
-            except KeyError:
-                pass
-
-            try:
-                cells["cell{0}{1}".format(cells[i].x - 1, cells[i].y)].number += 1  # top
-            except KeyError:
-                pass
-
-            try:
-                cells["cell{0}{1}".format(cells[i].x - 1, cells[i].y + 1)].number += 1  # top right
-            except KeyError:
-                pass
-
-            try:
-                cells["cell{0}{1}".format(cells[i].x - 1, cells[i].y - 1)].number += 1  # top left
-            except KeyError:
-                pass
-
-            try:
-                cells["cell{0}{1}".format(cells[i].x + 1, cells[i].y + 1)].number += 1  # bottom right
-            except KeyError:
-                pass
-
-            try:
-                cells["cell{0}{1}".format(cells[i].x + 1, cells[i].y - 1)].number += 1  # bottom left
-            except KeyError:
-                pass
+            for j in positions:
+                try:
+                    cells["cell{0}{1}".format(cells[i].x + j[0], cells[i].y + j[1])].number += 1
+                except KeyError:
+                    pass
 
     for k in cells:
         cells[k].button.config(image=img_blank)
@@ -200,7 +136,7 @@ def new_game():
             else:
                 cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False, f"cell{row}{cell}")
 
-    place_numbers()
+    place_numbers(positions)
 
 
 def options():  # rewrite this in a more pythonic way
