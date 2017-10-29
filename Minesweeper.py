@@ -1,96 +1,109 @@
 # Minesweeper
 # by Javad Hamidi
-# Minesweeper.py 4.1.0
+# Minesweeper.py 4.2.7
 # 01/09/2017
 
-from tkinter import *
+from tkinter import *  # imports the whole tkinter library for GUI making
 
-import webbrowser
+import webbrowser  # lets you open websites from within a python function
 import random
 
 root = Tk()  # Creates the GUI's main window
-root.resizable(0, 0)  # disables resizing
-root.title("Minesweeper")
-root.wm_iconbitmap('assets\ico\mine.ico')
+root.resizable(0, 0)  # disables any resizing of the window
+root.title("Minesweeper")  # sets the window title
+root.wm_iconbitmap('assets\ico\mine.ico')  # sets the window icon in corner
 
+# creates a heading labeled 'Minesweeper' above the game
 Label(root, text="Minesweeper").grid(row=0, column=0, columnspan=10)
 
+# sets initial height, width and number of mines
 x = 9
 y = 9
 mines = 10
 
+# 'cells' dictionary stores every instance of the cell class
 cells = {}
+
+# 'positions' represent the x and y coordinates in all eight positions around a cell
+# [0, 1] is up, because the if you change the x by 0 and the y by one, you go one up
 positions = [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1], [-1, 0], [1, 0]]
 
-img_nums = []
+# imports all image assets and assigns them to variables
 img_blank = PhotoImage(file="assets/gif/blank.gif")
 img_mine = PhotoImage(file="assets/gif/mine.gif")
 img_fail_mine = PhotoImage(file="assets/gif/fail_mine.gif")
 img_not_mine = PhotoImage(file="assets/gif/not_mine.gif")
 img_flag = PhotoImage(file="assets/gif/flag.gif")
-for img in range(9):
+
+# stores all the numbers in a single list in order; img_nums[0] = 0.gif, img_nums[1] = 1.gif, etc.
+img_nums = []
+for img in range(9): 
     img_nums.append(PhotoImage(file="assets/gif/" + str(img) + ".gif"))
 
 
+# creates an object called 'Cell'
 class Cell:
     def __init__(self, position_x, position_y, mine, name):
+        # sets default values to all used variables based on parameters given on instance creation
         self.name = name
         self.has_mine = mine
         self.number = 0
-        self.clicked = False
         self.flagged = False
         self.x = position_x
         self.y = position_y
+        self.clicked = False
 
         def flood_click(position):
-            if position.flagged:
-                position.button.config(image=img_flag)
-                position.clicked = False
-            else:
-                position.clicked = True
+            if not position.flagged:
                 position.button.config(image=img_nums[cells[position.name].number], relief=RIDGE)
+                self.clicked = True
 
-        def flood_fill(selected_cell):
-            rad = 1
-            cell_positions = [[0, rad], [0, -rad], [rad, rad], [rad, -rad], [-rad, rad], [-rad, -rad], [-rad, 0], [rad, 0]]
-            if selected_cell.number == 0 and not selected_cell.flagged:
-                for j in range(1, 5):
-                    for i in cell_positions:
-                        try:
-                            flood_click(cells["cell{0}{1}".format(selected_cell.x + i[0], selected_cell.y + i[1])])
-                        except KeyError:
-                            pass
-                    rad += j
-                    cell_positions = cell_positions
+        def flood_neighbours(selected_cell, cell_positions):
+            for i in cell_positions:
+                try:
+                    flood_click(cells["cell{0}{1}".format(selected_cell.x + i[0], selected_cell.y + i[1])])
 
-        def click():  # redo this
-            if self.has_mine:
+                # if a cell is on an edge or corner, without all 8 surrounding cells, this will catch an errors caused by the program looking for non-excising cells
+                except KeyError:
+                    pass
+
+        def click():  # this function is called when a user clicks on a cell to decide what happens
+            """
+            if the user clicks on a cell with a mine, the program will then scan through all cells to see weather or not
+            any others have mines. If a cell has a mine, it will check to see if it has been flagged. If it has been
+            flagged, the program will pass that cell. If it has not been flagged, that cell will show the mine (img_mine).
+            If the cell has been flagged but does not have a mine, it will show img_not_mine. Finally, it will set itself
+            to img_fail_mine. Any other cell will remain the same.
+            """
+
+            self.clicked = True
+
+            if self.flagged:  # prevents cell from being clicked if it has been flagged already by setting flagged to False
+                self.clicked = False
+
+            elif self.has_mine:
                 for l in cells:
-                    if not cells[l].flagged:
-                        if cells[l].has_mine:
+                    if cells[l].has_mine:
+                        if cells[l].flagged:
+                            pass
+                        else:
                             cells[l].button.config(image=img_mine, relief=RIDGE)
-                            cells[l].clicked = True
                     elif cells[l].flagged:
-                        # cells[l].button.config(image=img_not_mine, relief=RIDGE)
-                        cells[l].clicked = True
-                self.button.config(image=img_fail_mine, relief=RIDGE)  # this doesn't make sense
-                self.clicked = True
-            elif self.flagged:
-                pass
-            elif self.number > 0:
+                        cells[l].button.config(image=img_not_mine, relief=RIDGE)
+                self.button.config(image=img_fail_mine, relief=RIDGE)
+
+            elif self.number > 0:  # if the cell isn't blank (does not have a 0 value), it will reveal itself
                 self.button.config(image=img_nums[self.number], relief=RIDGE)
-                self.clicked = True
 
-            else:
-                self.clicked = True
+            else:  # if the cell is blank, it will reveal itself, and all its neighbours
                 self.button.config(image=img_nums[self.number], relief=RIDGE)
-                flood_fill(self)
+                flood_neighbours(self, positions)
 
-        self.button = Button(root, command=click)
-        self.button.grid(row=position_x, column=position_y)
+        self.button = Button(root, command=click)  # creates a button using the tkinter 'Button' function, and assigns it to a variable
+        self.button.grid(row=position_x, column=position_y)  # uses the grid positioning method to place buttons in the correct places
 
-        def flag(right_click):
-            if not self.clicked:
+        def flag(event):  # method called when right mouse button is clicked. The 'event' parameter is passed by tkinter but not used in the method
+            if not self.clicked:  # if the cell hasn't been already clicked
                 if self.flagged:
                     self.button.config(image=img_blank, relief=RAISED)
                     self.flagged = False
@@ -98,74 +111,88 @@ class Cell:
                     self.button.config(image=img_flag, relief=RAISED)
                     self.flagged = True
 
-        def reveal_adjacent(middle_click):
+        def reveal_adjacent(event, cell_positions):
             """
             if you middle-click a number, and it is surrounded by exactly that many flags (as indicated by the number),
             all covered tiles become uncovered﻿
             """
 
-        self.button.bind('<Button-2>', reveal_adjacent)
-        self.button.bind('<Button-3>', flag)  # bind right mouse click
+            flags = 0
+            if self.number > 0:
+                for i in cell_positions:
+                    if cells["cell{0}{1}".format(self.x + i[0], self.y + i[1])].flagged:
+                        try:
+                            flood_click(cells["cell{0}{1}".format(self.x + i[0], self.y + i[1])])
+                        except KeyError:
+                            pass
+
+        self.button.bind('<Button-3>', flag, positions)  # binds the right mouse click to the 'reveal_adjacent' method
+        self.button.bind('<Button-2>', reveal_adjacent)  # binds the middle mouse button to the 'reveal_adjacent' method
 
 
-def place_numbers(positions):
+def place_numbers(coordinates):
     for i in cells:
         if cells[i].has_mine:
-            for j in positions:
+            for j in coordinates:
                 try:
                     cells["cell{0}{1}".format(cells[i].x + j[0], cells[i].y + j[1])].number += 1
                 except KeyError:
                     pass
 
-    for k in cells:
-        cells[k].button.config(image=img_blank)
+    # set each cell as blank for each new game
+    for i in cells:
+        cells[i].button.config(image=img_blank)
 
 
 def new_game():
+    # creates a list that stores all the potential instance positions on the grid
     locations = []
+    for i in range(1, (y + 1)):
+        locations += list(range(int(str(i) + str(1)), int(str(i + 1) + str(0))))
 
-    for j in range(1, (y + 1)):
-        locations += list(range(int(str(j) + str(1)), int(str(j + 1) + str(0))))
-
+    # depending on the number of mines chosen, 'random.sample' selects random 'locations' and assigns them to a variable ('mine_locations') in a list
+    # this serve as the list of random coordinates for the cells with mines
     mine_locations = random.sample(locations, mines)
 
-    for row in range(1, (x + 1)):
-        for cell in range(1, (y + 1)):
-            if int(str(row) + str(cell)) in mine_locations:
-                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, True, f"cell{row}{cell}")
+    # this loop creates all the cell instances based on the provided height and width of grid and stores them in the 'Cells' dictionary
+    for cell in range(1, (x + 1)):
+        for row in range(1, (y + 1)):
+            # on creation, cells are checked for whether their coordinates match those in 'mine_locations'; whether it should be a mine
+            if int(str(cell) + str(row)) in mine_locations:
+                cells["cell{0}{1}".format(cell, row)] = Cell(cell, row, True, f"cell{cell}{row}")
             else:
-                cells["cell{0}{1}".format(row, cell)] = Cell(row, cell, False, f"cell{row}{cell}")
+                cells["cell{0}{1}".format(cell, row)] = Cell(cell, row, False, f"cell{cell}{row}")
 
-    place_numbers(positions)
+    place_numbers(positions)  # after the cells are created and the mines are placed, the 'place_numbers' function is called to place the numbers
 
 
-def options():  # rewrite this in a more pythonic way
-    options_menu = Toplevel()
-    options_menu.wm_iconbitmap(r'assets\ico\blank.ico')
-    options_menu.title("Options")
+def options():  # this function displays and opens the minesweeper's option menu
+    options_menu = Toplevel()  # creates a 'Toplevel' menu (a pop-up window in tkinter) stored in the options_menu variable
+    options_menu.wm_iconbitmap(r'assets\ico\blank.ico')  # sets the window's icon as a blank image
+    options_menu.title("Options")  # sets the window title as 'Options'
 
+    # creates three lines of text next to the three entry boxes to label them
     Label(options_menu, text="Height (9-24):").pack(side=LEFT, padx=5, pady=5)
     Label(options_menu, text="Width (9-30):").pack(side=LEFT, padx=5, pady=5)
     Label(options_menu, text="Mines (10-67):").pack(side=LEFT, padx=5, pady=5)
 
+    # creates three text entry boxes
     e1 = Entry(options_menu)
     e2 = Entry(options_menu)
     e3 = Entry(options_menu)
 
-    e1.delete(0, END)
+    # puts the currently assigned values as default text in each entry box
     e1.insert(0, x)
-
-    e2.delete(0, END)
     e2.insert(0, y)
-
-    e3.delete(0, END)
     e3.insert(0, mines)
 
+    # pack is what tkinter uses to place the entry box widgets
     e1.pack(side=LEFT, padx=5, pady=5)
     e2.pack(side=LEFT, padx=5, pady=5)
     e3.pack(side=LEFT, padx=5, pady=5)
 
-    def save():
+    def save():  # establishes the function of the 'Save' button
+        # sets the x, y and mines variables outside of the function to the given values in the entry boxes
         global x
         x = int(e1.get())
         global y
@@ -173,18 +200,18 @@ def options():  # rewrite this in a more pythonic way
         global mines
         mines = int(e3.get())
 
-        new_game()
-        options_menu.destroy()
+        new_game()  # restarts the game with the new parameters
+        options_menu.destroy()  # closes the options menu
 
-    Button(options_menu, text="Save", command=save).pack()
+    Button(options_menu, text="Save", command=save).pack()  # creates and displays the 'Save' button
 
 
-def about():
+def about():  # when the about button is pressed, this function opens the appropriate external website
     webbrowser.open("https://github.com/Vadeghan/Minesweeper")
 
-menu = Menu(root)
+menu = Menu(root)  # creates a tkinter 'Menu' stored in the menu variable
 
-game_menu = Menu(menu, tearoff=0)
+game_menu = Menu(menu, tearoff=0)  # within 'menu' a sub-menu is created stored in 'game_menu'
 game_menu.add_command(label="New Game", command=new_game)
 game_menu.add_command(label="Options", command=options)
 game_menu.add_separator()
@@ -194,12 +221,12 @@ game_menu.add_command(label="Exit", command=root.quit)
 about_menu = Menu(menu, tearoff=0)
 about_menu.add_command(label="About", command=about)
 
-
+# the sub-menus 'game_menu' and 'about_menu are made accessable through a button on the cascade, created by the 'add_cascade' method
 menu.add_cascade(label="Game", menu=game_menu)
 menu.add_cascade(label="Help", menu=about_menu)
 
-root.config(menu=menu)
+root.config(menu=menu)  # establishes that the GUI's menu is stored in the 'menu' variable
 
-new_game()
+new_game()  # starts the program by creating a new game
 
-root.mainloop()  # Keeps window running until closed out
+root.mainloop()  # keeps the main window running until closed out by user
