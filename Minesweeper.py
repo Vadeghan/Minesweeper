@@ -60,44 +60,45 @@ class Cell:
 
         def flood_neighbours(selected_cell, cell_positions):
             for i in cell_positions:
+                # if a cell is on an edge or corner, without all 8 surrounding cells, this will catch any errors caused by the program looking for the non-existent cells
                 try:
                     flood_click(cells["cell{0}{1}".format(selected_cell.x + i[0], selected_cell.y + i[1])])
-
-                # if a cell is on an edge or corner, without all 8 surrounding cells, this will catch an errors caused by the program looking for non-excising cells
                 except KeyError:
                     pass
 
         def click():  # this function is called when a user clicks on a cell to decide what happens
-            """
-            if the user clicks on a cell with a mine, the program will then scan through all cells to see weather or not
-            any others have mines. If a cell has a mine, it will check to see if it has been flagged. If it has been
-            flagged, the program will pass that cell. If it has not been flagged, that cell will show the mine (img_mine).
-            If the cell has been flagged but does not have a mine, it will show img_not_mine. Finally, it will set itself
-            to img_fail_mine. Any other cell will remain the same.
-            """
+            if not self.clicked:  # prevents already clicked cells from being clicked on again
+                """
+                if the user clicks on a cell with a mine, the program will then scan through all cells to see weather or not
+                any others have mines. If a cell has a mine, it will check to see if it has been flagged. If it has been
+                flagged, the program will pass that cell. If it has not been flagged, that cell will show the mine (img_mine).
+                If the cell has been flagged but does not have a mine, it will show img_not_mine. Finally, the initially 
+                selected cell it will set itself to img_fail_mine. Any other cells will remain the same as before.
+                """
 
-            self.clicked = True
+                self.clicked = True
 
-            if self.flagged:  # prevents cell from being clicked if it has been flagged already by setting flagged to False
-                self.clicked = False
+                if self.flagged:  # prevents cell from being clicked if it has been flagged already by setting flagged to False
+                    self.clicked = False
 
-            elif self.has_mine:
-                for l in cells:
-                    if cells[l].has_mine:
-                        if cells[l].flagged:
-                            pass
-                        else:
-                            cells[l].button.config(image=img_mine, relief=RIDGE)
-                    elif cells[l].flagged:
-                        cells[l].button.config(image=img_not_mine, relief=RIDGE)
-                self.button.config(image=img_fail_mine, relief=RIDGE)
+                elif self.has_mine:
+                    for l in cells:
+                        cells[l].clicked = True  # sets all cells on the board as clicked -- comment out this line for bug testing
+                        if cells[l].has_mine:
+                            if cells[l].flagged:
+                                pass
+                            else:
+                                cells[l].button.config(image=img_mine, relief=RIDGE)
+                        elif cells[l].flagged:
+                            cells[l].button.config(image=img_not_mine, relief=RIDGE)
+                    self.button.config(image=img_fail_mine, relief=RIDGE)
 
-            elif self.number > 0:  # if the cell isn't blank (does not have a 0 value), it will reveal itself
-                self.button.config(image=img_nums[self.number], relief=RIDGE)
+                elif self.number > 0:  # if the cell isn't blank (does not have a 0 value), it will reveal itself
+                    self.button.config(image=img_nums[self.number], relief=RIDGE)
 
-            else:  # if the cell is blank, it will reveal itself, and all its neighbours
-                self.button.config(image=img_nums[self.number], relief=RIDGE)
-                flood_neighbours(self, positions)
+                else:  # if the cell is blank, it will reveal itself and all its neighbours by calling the 'flood_neighbours' function
+                    self.button.config(image=img_nums[self.number], relief=RIDGE)
+                    flood_neighbours(self, positions)
 
         self.button = Button(root, command=click)  # creates a button using the tkinter 'Button' function, and assigns it to a variable
         self.button.grid(row=position_x, column=position_y)  # uses the grid positioning method to place buttons in the correct places
@@ -117,7 +118,6 @@ class Cell:
             all covered tiles become uncovered﻿
             """
 
-            flags = 0
             if self.number > 0:
                 for i in cell_positions:
                     if cells["cell{0}{1}".format(self.x + i[0], self.y + i[1])].flagged:
@@ -130,7 +130,8 @@ class Cell:
         self.button.bind('<Button-2>', reveal_adjacent)  # binds the middle mouse button to the 'reveal_adjacent' method
 
 
-def place_numbers(coordinates):
+# 'place_numbers' scans every cell on the board, and for each mine, its adjacent cells' number is is increased by one
+def place_numbers(coordinates):  # coordinates is 'positions' taken as the function's parameter
     for i in cells:
         if cells[i].has_mine:
             for j in coordinates:
@@ -139,7 +140,7 @@ def place_numbers(coordinates):
                 except KeyError:
                     pass
 
-    # set each cell as blank for each new game
+    # set each cell as blank when the game starts
     for i in cells:
         cells[i].button.config(image=img_blank)
 
