@@ -3,7 +3,7 @@
 # Minesweeper.py 4.2.7
 # 01/09/2017
 
-from tkinter import *  # imports the whole tkinter library for GUI making
+from Tkinter import *  # imports the whole tkinter library for GUI making
 
 import webbrowser  # lets you open websites from within a python function
 import random
@@ -11,7 +11,7 @@ import random
 root = Tk()  # Creates the GUI's main window
 root.resizable(0, 0)  # disables any resizing of the window
 root.title("Minesweeper")  # sets the window title
-root.wm_iconbitmap('assets\ico\mine.ico')  # sets the window icon in corner
+root.wm_iconbitmap('@assets/linux/xbm/mine.xbm')  # sets the window icon in corner
 
 # creates a heading labeled 'Minesweeper' above the game
 Label(root, text="Minesweeper").grid(row=0, column=0, columnspan=10)
@@ -29,16 +29,16 @@ cells = {}
 positions = [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1], [-1, 0], [1, 0]]
 
 # imports all image assets and assigns them to variables
-img_blank = PhotoImage(file="assets/gif/blank.gif")
-img_mine = PhotoImage(file="assets/gif/mine.gif")
-img_fail_mine = PhotoImage(file="assets/gif/fail_mine.gif")
-img_not_mine = PhotoImage(file="assets/gif/not_mine.gif")
-img_flag = PhotoImage(file="assets/gif/flag.gif")
+img_blank = PhotoImage(file="assets/linux/gif/blank.gif")
+img_mine = PhotoImage(file="assets/linux/gif/mine.gif")
+img_fail_mine = PhotoImage(file="assets/linux/gif/fail_mine.gif")
+img_not_mine = PhotoImage(file="assets/linux/gif/not_mine.gif")
+img_flag = PhotoImage(file="assets/linux/gif/flag.gif")
 
 # stores all the numbers in a single list in order; img_nums[0] = 0.gif, img_nums[1] = 1.gif, etc.
 img_nums = []
 for img in range(9): 
-    img_nums.append(PhotoImage(file="assets/gif/" + str(img) + ".gif"))
+    img_nums.append(PhotoImage(file="assets/linux/gif/" + str(img) + ".gif"))
 
 
 # creates an object called 'Cell'
@@ -115,7 +115,7 @@ class Cell:
         def reveal_adjacent(event, cell_positions):
             """
             if you middle-click a number, and it is surrounded by exactly that many flags (as indicated by the number),
-            all covered tiles become uncovered﻿
+            all covered tiles become uncovered
             """
 
             if self.number > 0:
@@ -160,9 +160,10 @@ def new_game():
         for row in range(1, (y + 1)):
             # on creation, cells are checked for whether their coordinates match those in 'mine_locations'; whether it should be a mine
             if int(str(cell) + str(row)) in mine_locations:
-                cells["cell{0}{1}".format(cell, row)] = Cell(cell, row, True, f"cell{cell}{row}")
+                pass
+                #cells["cell{0}{1}".format(cell, row)] = Cell(cell, row, True, f"cell{cell}{row}")
             else:
-                cells["cell{0}{1}".format(cell, row)] = Cell(cell, row, False, f"cell{cell}{row}")
+                cells["cell{0}{1}".format(cell, row)] = Cell(cell, row, False, "cell{cell}{row}")
 
     place_numbers(positions)  # after the cells are created and the mines are placed, the 'place_numbers' function is called to place the numbers
 
