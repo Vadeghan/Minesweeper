@@ -30,6 +30,23 @@ def create_grid(x, y , mines):
                 sub_array.append(Cell(cell, row, False))
         grid.append(sub_array)
 
+
+# 'place_numbers' scans every cell on the board, and for each mine, its adjacent cells' number is is increased by one
+def place_numbers():  # coordinates is 'positions' taken as the function's parameter
+    # 'positions' represent the x and y coordinates in all eight positions around a cell
+    # [0, 1] is up, because the if you change the x by 0 and the y by one, you go one up
+    coordinates = [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1], [-1, 0], [1, 0]]
+
+    for i in range(x):
+        for j in range(y):
+            if grid[i][j].has_mine:
+                for k in coordinates:
+                    try:
+                        print(grid[i + k[0]][j + k[1]].number + 1)
+                    except IndexError:
+                        pass
+
+
 # creates an object called 'Cell'
 class Cell:
     def __init__(self, position_right, position_down, mine):

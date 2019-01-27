@@ -24,10 +24,13 @@ positions = [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1], [-1, 0], [1, 0
 
 create_grid(x, y, mines)
 
-for i in grid:
-    for j in i:
-        print(j.number)
+place_numbers()
 
+for i in grid:
+    line = []
+    for j in i:
+        line.append(j.number)
+    print(line)
 
 
 """
