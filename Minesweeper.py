@@ -26,12 +26,28 @@ create_grid(x, y, mines)
 
 place_numbers()
 
-for i in grid:
-    line = []
-    for j in i:
-        line.append(j.number)
-    print(line)
+def print_grid():
+    for i in grid:
+        line = []
+        for j in i:
+            if j.has_mine:
+                line.append("x")
+            else:
+                line.append(str(j.number))
+        print(str(line))
 
+    for i in grid:
+        line = []
+        for j in i:
+            if False:
+                line.append("x")
+            else:
+                line.append(str(j.clicked))
+        print(str(line))
+
+flood_fill(grid[0][0])
+
+print_grid()
 
 """
 # 'place_numbers' scans every cell on the board, and for each mine, its adjacent cells' number is is increased by one
