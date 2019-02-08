@@ -48,7 +48,7 @@ def place_numbers():
                         pass
 
 def flood_fill(cell):
-        # if a cell is on an edge or corner, without all 8 surrounding cells, this will catch any errors caused by the program looking for the non-existent cells
+    # if a cell is on an edge or corner, without all 8 surrounding cells, this will catch any errors caused by the program looking for the non-existent cells
     if cell.clicked != True and cell.number == 0:
         cell.clicked = True
 

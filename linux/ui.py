@@ -25,6 +25,8 @@ for img in range(9):
 
 
 
+
+
 def options():  # this function displays and opens the minesweeper's option menu
     options_menu = Toplevel()  # creates a 'Toplevel' menu (a pop-up window in tkinter) stored in the options_menu variable
     options_menu.wm_iconbitmap(r'assets\ico\blank.ico')  # sets the window's icon as a blank image
@@ -66,7 +68,7 @@ def options():  # this function displays and opens the minesweeper's option menu
 
 
 def about():  # when the about button is pressed, this function opens the appropriate external website
-    webbrowser.open("https://github.com/Vadeghan/Minesweeper")
+    webbrowser.open("https://github.com/javadhamidi/Minesweeper")
 
 menu = Menu(root)  # creates a tkinter 'Menu' stored in the menu variable
 
